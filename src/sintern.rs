@@ -93,7 +93,7 @@ impl Interner {
         if let Some(&id) = self.map.get(name) {
             return id;
         }
-        let name = unsafe { self.alloc(name) };
+        let name = self.alloc(name);
         self.create(name)
     }
 
@@ -113,7 +113,7 @@ impl Interner {
     // Barely useful except for initialization.
     pub fn intern_extra(&mut self, name: &str) -> NameId {
         debug_assert!(self.intern_no_create(name) == NO_ID);
-        let name = unsafe { self.alloc(name) };
+        let name = self.alloc(name);
         let id = NameId(self.vec.len() as u32);
         self.vec.push((name, 0));
         id
@@ -138,7 +138,7 @@ impl Interner {
     }
 
     // Copy the string [name].
-    unsafe fn alloc(&mut self, name: &str) -> &'static str {
+    fn alloc(&mut self, name: &str) -> &'static str {
         let cap = self.buf.capacity();
         let len = name.len() + 1;
         if cap < self.buf.len() + len {
@@ -158,6 +158,6 @@ impl Interner {
             &self.buf[start..start + len - 1]
         };
 
-        &*(interned as *const str)
+        unsafe { &*(interned as *const str) }
     }
 }
