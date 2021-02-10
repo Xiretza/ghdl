@@ -24,6 +24,8 @@
 //! * Make it multi-thread ready (an RW lock should be enough).
 use std::{collections::HashMap, mem};
 
+mod ffi;
+
 /// Identifiers.
 /// They represent a interned string (use [lookup] to get it).
 /// Strings are equal iff the identifiers are equal.

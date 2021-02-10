@@ -242,6 +242,7 @@ copy-sources.gcc: version.ads
 	$(CP) -p version.ads ghdlsynth_maybe.ads $(gcc_vhdl_dir)
 	$(CP) -p $(srcdir)/src/*.ad? $(gcc_vhdl_dir)
 	$(CP) -p $(srcdir)/src/*.rs $(gcc_vhdl_dir)
+	$(CP) -rp $(srcdir)/src/sintern $(gcc_vhdl_dir)
 	$(SED) -e '/^path =/s@src/@@' \
 	  < $(srcdir)/Cargo.toml > $(gcc_vhdl_dir)/Cargo.toml
 	$(CP) -p $(srcdir)/src/vhdl/*.ad? $(gcc_vhdl_dir)
