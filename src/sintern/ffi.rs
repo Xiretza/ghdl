@@ -36,12 +36,13 @@ pub extern "C" fn sintern_get_identifier_no_create_with_len(
     name: *const u8,
     len: u32,
 ) -> NameId {
-    unsafe {
-        inst.get_id(std::str::from_utf8_unchecked(slice::from_raw_parts(
-            name,
-            len as usize,
-        )))
+    let id = inst.get_id(unsafe {
+        std::str::from_utf8_unchecked(slice::from_raw_parts(name, len as usize))
+    });
+    if let Some(NameId(0)) = id {
+        panic!("Tried to get string with ID 0, but this ID is reserved to represent the string not being present");
     }
+    id.unwrap_or(NameId(0))
 }
 
 // Return the unique id without copying the string [name].

@@ -33,11 +33,6 @@ mod ffi;
 #[repr(C)]
 pub struct NameId(u32);
 
-/// No identifier.
-/// This is in fact the identifier of length 0, which may be returned to
-/// indicate the absence of identifiers.
-pub const NO_ID: NameId = NameId(0);
-
 pub struct Interner {
     //  Map strings to identifiers.
     map: HashMap<&'static str, NameId>,
@@ -79,13 +74,9 @@ impl Interner {
         self.vec[id.0 as usize].1 = info;
     }
 
-    // Return the corresponding identifier to the string [name], or [NO_ID]
-    // if the string was never interned.
-    pub fn get_id(&mut self, name: &str) -> NameId {
-        if let Some(&id) = self.map.get(name) {
-            return id;
-        }
-        NO_ID
+    // Return the identifier for the string [name] if it has already been interned.
+    pub fn get_id(&mut self, name: &str) -> Option<NameId> {
+        self.map.get(name).copied()
     }
 
     // Intern string [name] and return the corresponding identifier.
@@ -112,7 +103,7 @@ impl Interner {
     // Intern [name] when it is known not to be present.
     // Barely useful except for initialization.
     pub fn intern_extra(&mut self, name: &str) -> NameId {
-        debug_assert!(self.get_id(name) == NO_ID);
+        debug_assert!(self.get_id(name).is_none());
         let name = self.alloc(name);
         let id = NameId(self.vec.len() as u32);
         self.vec.push((name, 0));
