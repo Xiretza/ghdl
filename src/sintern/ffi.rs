@@ -90,6 +90,7 @@ pub extern "C" fn sintern_get_length(inst: &Interner, id: NameId) -> u32 {
 #[no_mangle]
 pub extern "C" fn sintern_get_last(inst: &Interner) -> NameId {
     inst.get_last()
+        .expect("Tried to get last string ID, but interner contains no strings")
 }
 
 #[no_mangle]

@@ -119,10 +119,13 @@ impl Interner {
         id
     }
 
-    // Return the last known identifier.
-    // Will panic if empty.
-    pub fn get_last(&self) -> NameId {
-        NameId((self.vec.len() - 1) as u32)
+    // Return the last known identifier, if any.
+    pub fn get_last(&self) -> Option<NameId> {
+        if self.vec.is_empty() {
+            None
+        } else {
+            Some(NameId((self.vec.len() - 1) as u32))
+        }
     }
 
     // Internal helper: create an identifier for [name].
