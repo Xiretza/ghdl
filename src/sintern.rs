@@ -81,7 +81,7 @@ impl Interner {
 
     // Return the corresponding identifier to the string [name], or [NO_ID]
     // if the string was never interned.
-    pub fn intern_no_create(&mut self, name: &str) -> NameId {
+    pub fn get_id(&mut self, name: &str) -> NameId {
         if let Some(&id) = self.map.get(name) {
             return id;
         }
@@ -112,7 +112,7 @@ impl Interner {
     // Intern [name] when it is known not to be present.
     // Barely useful except for initialization.
     pub fn intern_extra(&mut self, name: &str) -> NameId {
-        debug_assert!(self.intern_no_create(name) == NO_ID);
+        debug_assert!(self.get_id(name) == NO_ID);
         let name = self.alloc(name);
         let id = NameId(self.vec.len() as u32);
         self.vec.push((name, 0));

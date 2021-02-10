@@ -37,7 +37,7 @@ pub extern "C" fn sintern_get_identifier_no_create_with_len(
     len: u32,
 ) -> NameId {
     unsafe {
-        inst.intern_no_create(std::str::from_utf8_unchecked(slice::from_raw_parts(
+        inst.get_id(std::str::from_utf8_unchecked(slice::from_raw_parts(
             name,
             len as usize,
         )))
