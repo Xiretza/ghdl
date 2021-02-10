@@ -66,20 +66,17 @@ impl Interner {
     // Return the string corresponding to [id]. Will panic if [id]
     // is not valid (eg was not returned by a method defined here).
     pub fn lookup(&self, id: NameId) -> &str {
-        let NameId(id) = id;
-        self.vec[id as usize].0
+        self.vec[id.0 as usize].0
     }
 
     // Return the info associated to [id].
     pub fn get_info(&self, id: NameId) -> u32 {
-        let NameId(id) = id;
-        self.vec[id as usize].1
+        self.vec[id.0 as usize].1
     }
 
     // Set the info associated with [id]
     pub fn set_info(&mut self, id: NameId, info: u32) {
-        let NameId(id) = id;
-        self.vec[id as usize].1 = info;
+        self.vec[id.0 as usize].1 = info;
     }
 
     // Return the corresponding identifier to the string [name], or [NO_ID]
