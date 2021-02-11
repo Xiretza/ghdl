@@ -94,5 +94,5 @@ doc/pyGHDL/**/*.*
 #already existing elements are commented out
 
 /target
+/target-pic
 **/*.rs.bk
-Cargo.lock
