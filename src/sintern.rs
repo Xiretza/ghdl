@@ -22,7 +22,7 @@
 //! TODO (in the future) :
 //! * Reduce memory requirement (this will certainly need to write our own hash map)
 //! * Make it multi-thread ready (an RW lock should be enough).
-use std::{mem, collections::HashMap};
+use std::{collections::HashMap, mem};
 
 /// Identifiers.
 /// They represent a interned string (use [lookup] to get it).
@@ -123,7 +123,7 @@ impl Interner {
     // Return the last known identifier.
     // Will panic if empty.
     pub fn get_last(&self) -> NameId {
-     NameId((self.vec.len() - 1) as u32)
+        NameId((self.vec.len() - 1) as u32)
     }
 
     // Internal helper: create an identifier for [name].

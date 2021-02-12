@@ -22,7 +22,11 @@ pub struct Sha1State {
 
 impl fmt::Debug for Sha1State {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:x} {:x} {:x} {:x} {:x}", self.a, self.b, self.c, self.d, self.e)
+        write!(
+            f,
+            "{:x} {:x} {:x} {:x} {:x}",
+            self.a, self.b, self.c, self.d, self.e
+        )
     }
 }
 
@@ -30,57 +34,99 @@ fn rot(v: u32, amount: usize) -> u32 {
     (v << amount) | (v >> (32 - amount))
 }
 
-fn p0(v: Sha1State, w: [u32;16], t: usize) -> Sha1State {
+fn p0(v: Sha1State, w: [u32; 16], t: usize) -> Sha1State {
     let temp = rot(v.a, 5)
         .wrapping_add((v.b & v.c) | (!v.b & v.d))
         .wrapping_add(v.e)
         .wrapping_add(w[t])
         .wrapping_add(K0);
-    Sha1State{a: temp, b: v.a, c: rot(v.b, 30), d: v.c, e: v.d}
+    Sha1State {
+        a: temp,
+        b: v.a,
+        c: rot(v.b, 30),
+        d: v.c,
+        e: v.d,
+    }
 }
 
-fn p0b(v: Sha1State, w: &mut [u32;16], t: usize) -> Sha1State {
-    w[t] = rot(w[(t+13) & 15] ^ w[(t+8) & 15] ^ w[(t+2) & 15] ^ w[t], 1);
+fn p0b(v: Sha1State, w: &mut [u32; 16], t: usize) -> Sha1State {
+    w[t] = rot(
+        w[(t + 13) & 15] ^ w[(t + 8) & 15] ^ w[(t + 2) & 15] ^ w[t],
+        1,
+    );
     let temp = rot(v.a, 5)
         .wrapping_add((v.b & v.c) | (!v.b & v.d))
         .wrapping_add(v.e)
         .wrapping_add(w[t])
         .wrapping_add(K0);
-    Sha1State{a: temp, b: v.a, c: rot(v.b, 30), d: v.c, e: v.d}
+    Sha1State {
+        a: temp,
+        b: v.a,
+        c: rot(v.b, 30),
+        d: v.c,
+        e: v.d,
+    }
 }
 
-fn p1(v: Sha1State, w: &mut [u32;16], t: usize) -> Sha1State {
-    w[t] = rot(w[(t+13) & 15] ^ w[(t+8) & 15] ^ w[(t+2) & 15] ^ w[t], 1);
+fn p1(v: Sha1State, w: &mut [u32; 16], t: usize) -> Sha1State {
+    w[t] = rot(
+        w[(t + 13) & 15] ^ w[(t + 8) & 15] ^ w[(t + 2) & 15] ^ w[t],
+        1,
+    );
     let temp = rot(v.a, 5)
         .wrapping_add(v.b ^ v.c ^ v.d)
         .wrapping_add(v.e)
         .wrapping_add(w[t])
         .wrapping_add(K1);
-    Sha1State{a: temp, b: v.a, c: rot(v.b, 30), d: v.c, e: v.d}
+    Sha1State {
+        a: temp,
+        b: v.a,
+        c: rot(v.b, 30),
+        d: v.c,
+        e: v.d,
+    }
 }
 
-fn p2(v: Sha1State, w: &mut [u32;16], t: usize) -> Sha1State {
-    w[t] = rot(w[(t+13) & 15] ^ w[(t+8) & 15] ^ w[(t+2) & 15] ^ w[t], 1);
+fn p2(v: Sha1State, w: &mut [u32; 16], t: usize) -> Sha1State {
+    w[t] = rot(
+        w[(t + 13) & 15] ^ w[(t + 8) & 15] ^ w[(t + 2) & 15] ^ w[t],
+        1,
+    );
     let temp = rot(v.a, 5)
-        .wrapping_add((v.b & v.c) | (v.b & v.d)| (v.c & v.d))
+        .wrapping_add((v.b & v.c) | (v.b & v.d) | (v.c & v.d))
         .wrapping_add(v.e)
         .wrapping_add(w[t & 15])
         .wrapping_add(K2);
-    Sha1State{a: temp, b: v.a, c: rot(v.b, 30), d: v.c, e: v.d}
+    Sha1State {
+        a: temp,
+        b: v.a,
+        c: rot(v.b, 30),
+        d: v.c,
+        e: v.d,
+    }
 }
 
-fn p3(v: Sha1State, w: &mut [u32;16], t: usize) -> Sha1State {
-    w[t] = rot(w[(t+13) & 15] ^ w[(t+8) & 15] ^ w[(t+2) & 15] ^ w[t], 1);
+fn p3(v: Sha1State, w: &mut [u32; 16], t: usize) -> Sha1State {
+    w[t] = rot(
+        w[(t + 13) & 15] ^ w[(t + 8) & 15] ^ w[(t + 2) & 15] ^ w[t],
+        1,
+    );
     let temp = rot(v.a, 5)
         .wrapping_add(v.b ^ v.c ^ v.d)
         .wrapping_add(v.e)
         .wrapping_add(w[t])
         .wrapping_add(K3);
-    Sha1State{a: temp, b: v.a, c: rot(v.b, 30), d: v.c, e: v.d}
+    Sha1State {
+        a: temp,
+        b: v.a,
+        c: rot(v.b, 30),
+        d: v.c,
+        e: v.d,
+    }
 }
 
-fn process_block(blk: &mut Sha1State, dat: [u32;16]) {
-    let mut w: [u32;16] = dat;
+fn process_block(blk: &mut Sha1State, dat: [u32; 16]) {
+    let mut w: [u32; 16] = dat;
 
     // a. Divide Mi into 16 words W0, W1, ..., W15 where W0 is the
     // left-most word.
@@ -184,17 +230,26 @@ fn process_block(blk: &mut Sha1State, dat: [u32;16]) {
     blk.e = blk.e.wrapping_add(v.e);
 }
 
-fn to_u32x16(v: &[u8]) -> [u32;16] {
-    let mut res: [u32;16] = [0; 16];
+fn to_u32x16(v: &[u8]) -> [u32; 16] {
+    let mut res: [u32; 16] = [0; 16];
     for i in 0..16 {
-        res[i] = ((v[i*4] as u32) << 24) | ((v[i*4 + 1] as u32) << 16) | ((v[i*4 + 2] as u32) << 8) | (v[i*4 + 3] as u32);
+        res[i] = ((v[i * 4] as u32) << 24)
+            | ((v[i * 4 + 1] as u32) << 16)
+            | ((v[i * 4 + 2] as u32) << 8)
+            | (v[i * 4 + 3] as u32);
     }
     res
 }
 
 pub fn sha1(dat: &[u8]) -> Sha1State {
     //  Init
-    let mut res = Sha1State{a: H0, b: H1, c: H2, d: H3, e: H4};
+    let mut res = Sha1State {
+        a: H0,
+        b: H1,
+        c: H2,
+        d: H3,
+        e: H4,
+    };
 
     let len = dat.len();
     let mut off: usize = 0;
@@ -203,7 +258,7 @@ pub fn sha1(dat: &[u8]) -> Sha1State {
         process_block(&mut res, to_u32x16(&dat[off..off + 64]));
         off += 64;
     }
-    let mut pad: [u8;64] = [0;64];
+    let mut pad: [u8; 64] = [0; 64];
     for i in off..len {
         pad[i - off] = dat[i];
     }
@@ -219,7 +274,7 @@ pub fn sha1(dat: &[u8]) -> Sha1State {
         process_block(&mut res, padu32);
     } else {
         process_block(&mut res, padu32);
-        padu32 = [0;16];
+        padu32 = [0; 16];
         padu32[14] = lenh;
         padu32[15] = lenl;
         process_block(&mut res, padu32);
@@ -241,23 +296,68 @@ mod tests {
         println!("{:?}", r);
 
         let r = super::sha1_str("abc");
-        assert_eq!(r, Sha1State{a: 0xA9993E36, b: 0x4706816A,c: 0xBA3E2571, d: 0x7850C26C, e: 0x9CD0D89D});
+        assert_eq!(
+            r,
+            Sha1State {
+                a: 0xA9993E36,
+                b: 0x4706816A,
+                c: 0xBA3E2571,
+                d: 0x7850C26C,
+                e: 0x9CD0D89D
+            }
+        );
         println!("{:?}", r);
 
         let r = super::sha1_str("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq");
-        assert_eq!(r, Sha1State{a: 0x84983E44, b: 0x1C3BD26E, c: 0xBAAE4AA1, d: 0xF95129E5, e: 0xE54670F1});
+        assert_eq!(
+            r,
+            Sha1State {
+                a: 0x84983E44,
+                b: 0x1C3BD26E,
+                c: 0xBAAE4AA1,
+                d: 0xF95129E5,
+                e: 0xE54670F1
+            }
+        );
         println!("{:?}", r);
 
         let r = super::sha1_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        assert_eq!(r, Sha1State{a:0x0098ba82, b: 0x4b5c1642, c: 0x7bd7a112, d: 0x2a5a442a, e: 0x25ec644d});
+        assert_eq!(
+            r,
+            Sha1State {
+                a: 0x0098ba82,
+                b: 0x4b5c1642,
+                c: 0x7bd7a112,
+                d: 0x2a5a442a,
+                e: 0x25ec644d
+            }
+        );
         println!("{:?}", r);
 
         let r = super::sha1_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        assert_eq!(r, Sha1State{a:0x95e1bd51, b: 0xa218fc01, c: 0x7dc138e5, d: 0xb214c624, e: 0xd0c8ccb});
+        assert_eq!(
+            r,
+            Sha1State {
+                a: 0x95e1bd51,
+                b: 0xa218fc01,
+                c: 0x7dc138e5,
+                d: 0xb214c624,
+                e: 0xd0c8ccb
+            }
+        );
         println!("{:?}", r);
 
         let r = super::sha1_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        assert_eq!(r, Sha1State{a:0xb05d71c6, b :0x4979cb95, c: 0xfa74a33c, d: 0xdb31a40d, e: 0x258ae02e});
+        assert_eq!(
+            r,
+            Sha1State {
+                a: 0xb05d71c6,
+                b: 0x4979cb95,
+                c: 0xfa74a33c,
+                d: 0xdb31a40d,
+                e: 0x258ae02e
+            }
+        );
         println!("{:?}", r);
     }
 }
