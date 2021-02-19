@@ -71,7 +71,7 @@ jobs:
 # pyGHDL
 #
 
-  fmt:
+  pyghdl:
     runs-on: ubuntu-latest
     name: '🐍 pyGHDL'
     steps:
@@ -98,7 +98,31 @@ jobs:
         git diff --stat
         git diff --exit-code
 
-    - name: Check if python follows code formatting standards
+#
+# Formatting
+#
+
+  format:
+    runs-on: ubuntu-latest
+    name: '✨ Formatting'
+
+    steps:
+    - name: '🧰 Checkout'
+      uses: actions/checkout@v2
+
+    - name: '🐍 Setup Python'
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python -m pip install black
+
+    - name: '🦀 Check Rust code formatting'
+      run: cargo fmt -- --check --files-with-diff
+
+    - name: '🐍 Check python code formatting'
       run: python -m black --check pyGHDL
 
 #
