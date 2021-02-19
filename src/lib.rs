@@ -1,3 +1,3 @@
 mod ffi;
-mod sha1;
-mod sintern;
+pub mod sha1;
+pub mod sintern;
