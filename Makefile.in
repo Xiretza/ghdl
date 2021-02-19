@@ -136,6 +136,7 @@ install: install.$(backend)
 uninstall: uninstall.$(backend)
 
 test: test.$(backend)
+	cd $(srcdir); cargo test
 
 copy-sources: copy-sources.$(backend)
 
