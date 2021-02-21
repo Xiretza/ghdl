@@ -75,7 +75,7 @@ impl Interner {
     }
 
     // Return the identifier for the string [name] if it has already been interned.
-    pub fn get_id(&mut self, name: &str) -> Option<NameId> {
+    pub fn get_id(&self, name: &str) -> Option<NameId> {
         self.map.get(name).copied()
     }
 

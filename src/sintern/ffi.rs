@@ -95,7 +95,7 @@ pub extern "C" fn sintern_get_last(inst: &Interner) -> NameId {
 }
 
 #[no_mangle]
-pub extern "C" fn sintern_get_info(inst: &mut Interner, id: NameId) -> u32 {
+pub extern "C" fn sintern_get_info(inst: &Interner, id: NameId) -> u32 {
     inst.get_info(id)
 }
 
