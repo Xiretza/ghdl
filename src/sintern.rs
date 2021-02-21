@@ -155,3 +155,37 @@ impl Interner {
         unsafe { &*(interned as *const str) }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Interner;
+
+    #[test]
+    fn sanity() {
+        let mut int = Interner::with_capacity(8);
+
+        // make sure we're not accidentally comparing addresses by having two
+        // equal strings at different addresses
+        let hello = "Hello";
+        let hello2 = hello.to_owned();
+        let hello2 = hello2.as_str();
+        assert_eq!(hello, hello2);
+        assert_ne!(hello.as_ptr(), hello2.as_ptr());
+
+        let id_hello = int.intern(hello);
+        let id_world = int.intern("world");
+        assert_ne!(id_hello, id_world);
+
+        let str_hello = int.lookup(id_hello);
+        assert_eq!(str_hello, hello);
+        assert_eq!(str_hello, hello2);
+
+        let id_hello2 = int.intern(hello2);
+        assert_eq!(id_hello2, id_hello);
+        assert_ne!(id_hello2, id_world);
+
+        // test reallocation
+        let ids = ('A'..='Z').map(|c| int.intern(&c.to_string()).0);
+        assert!(ids.eq(2..=27));
+    }
+}
