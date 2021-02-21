@@ -21,12 +21,7 @@ pub extern "C" fn sintern_get_identifier_with_len(
     name: *const u8,
     len: u32,
 ) -> NameId {
-    unsafe {
-        inst.intern(std::str::from_utf8_unchecked(slice::from_raw_parts(
-            name,
-            len as usize,
-        )))
-    }
+    inst.intern(unsafe { std::str::from_utf8_unchecked(slice::from_raw_parts(name, len as usize)) })
 }
 
 // Return a unique id if it already exists.
@@ -52,12 +47,9 @@ pub extern "C" fn sintern_get_identifier_static_with_len(
     name: *const u8,
     len: u32,
 ) -> NameId {
-    unsafe {
-        inst.intern_static(std::str::from_utf8_unchecked(slice::from_raw_parts(
-            name,
-            len as usize,
-        )))
-    }
+    inst.intern_static(unsafe {
+        std::str::from_utf8_unchecked(slice::from_raw_parts(name, len as usize))
+    })
 }
 
 // Return the unique id when it is known not to already exist.
@@ -67,12 +59,9 @@ pub extern "C" fn sintern_get_identifier_extra_with_len(
     name: *const u8,
     len: u32,
 ) -> NameId {
-    unsafe {
-        inst.intern_extra(std::str::from_utf8_unchecked(slice::from_raw_parts(
-            name,
-            len as usize,
-        )))
-    }
+    inst.intern_extra(unsafe {
+        std::str::from_utf8_unchecked(slice::from_raw_parts(name, len as usize))
+    })
 }
 
 // Get the C string for the [id].  It is NULL terminated.
