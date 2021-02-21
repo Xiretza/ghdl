@@ -120,7 +120,9 @@ jobs:
         python -m pip install black
 
     - name: '🦀 Check Rust code formatting'
-      run: cargo fmt -- --check --files-with-diff
+      run: |
+        cargo fmt -- --check --files-with-diff
+        cargo clippy
 
     - name: '🐍 Check python code formatting'
       run: python -m black --check pyGHDL
