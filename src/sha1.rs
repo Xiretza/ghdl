@@ -259,9 +259,7 @@ pub fn sha1(dat: &[u8]) -> Sha1State {
         off += 64;
     }
     let mut pad: [u8; 64] = [0; 64];
-    for i in off..len {
-        pad[i - off] = dat[i];
-    }
+    pad[..(len - off)].clone_from_slice(&dat[off..len]);
     pad[len - off] = 0x80;
     let mut padu32 = to_u32x16(&pad[..]);
 
