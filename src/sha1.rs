@@ -266,7 +266,7 @@ pub fn sha1(dat: &[u8]) -> Sha1State {
     let lenh = ((len * 8) >> 32) as u32;
     let lenl = ((len * 8) & 0xffff_ffff) as u32;
 
-    if len - off < 55 {
+    if len - off < 56 {
         padu32[14] = lenh;
         padu32[15] = lenl;
         process_block(&mut res, padu32);
@@ -336,11 +336,11 @@ mod tests {
         assert_eq!(
             r,
             Sha1State {
-                a: 0x95e1bd51,
-                b: 0xa218fc01,
-                c: 0x7dc138e5,
-                d: 0xb214c624,
-                e: 0xd0c8ccb
+                a: 0xc1c8bbdc,
+                b: 0x22796e28,
+                c: 0xc0e15163,
+                d: 0xd20899b6,
+                e: 0x5621d65a
             }
         );
         println!("{:?}", r);
@@ -357,5 +357,41 @@ mod tests {
             }
         );
         println!("{:?}", r);
+
+        let r = super::sha1(&[0; 64]);
+        assert_eq!(
+            r,
+            Sha1State {
+                a: 0xC8D7D0EF,
+                b: 0x0EEDFA82,
+                c: 0xD2EA1AA5,
+                d: 0x92845B9A,
+                e: 0x6D4B02B7
+            }
+        );
+
+        let r = super::sha1(&[0; 55]);
+        assert_eq!(
+            r,
+            Sha1State {
+                a: 0x8e8832c6,
+                b: 0x42a6a38c,
+                c: 0x74c17fc9,
+                d: 0x2ccedc26,
+                e: 0x6c108e6c
+            }
+        );
+
+        let r = super::sha1(&[0; 56]);
+        assert_eq!(
+            r,
+            Sha1State {
+                a: 0x9438e360,
+                b: 0xf578e12c,
+                c: 0x0e0e8ed2,
+                d: 0x8e2c125c,
+                e: 0x1cefee16
+            }
+        );
     }
 }
