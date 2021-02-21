@@ -33,22 +33,22 @@ mod ffi;
 #[repr(C)]
 pub struct NameId(u32);
 
-pub struct Interner {
+pub struct Interner<'a> {
     //  Map strings to identifiers.
-    map: HashMap<&'static str, NameId>,
+    map: HashMap<&'a str, NameId>,
     //  Map identifiers to strings + info
-    vec: Vec<(&'static str, u32)>,
+    vec: Vec<(&'a str, u32)>,
     //  Current buffer where new strings are put.
     buf: String,
     //  Old (and full) buffers of existing strings.
     full: Vec<String>,
 }
 
-impl Interner {
+impl<'a> Interner<'a> {
     // Constructor, using [cap] bytes for the initial string buffer.
     // If you have too many characters, the buffer will be extended, so
     // this is an initial guess.
-    pub fn with_capacity(cap: usize) -> Interner {
+    pub fn with_capacity(cap: usize) -> Interner<'a> {
         let cap = cap.next_power_of_two();
         Interner {
             map: HashMap::default(),
@@ -60,7 +60,7 @@ impl Interner {
 
     // Return the string corresponding to [id]. Will panic if [id]
     // is not valid (eg was not returned by a method defined here).
-    pub fn lookup(&self, id: NameId) -> &str {
+    pub fn lookup(&self, id: NameId) -> &'a str {
         self.vec[id.0 as usize].0
     }
 
@@ -93,7 +93,7 @@ impl Interner {
     // This is a slight optimization.
     // Note: [name] should be followed by a NULL character to follow the
     // convention.
-    pub fn intern_static(&mut self, name: &'static str) -> NameId {
+    pub fn intern_static(&mut self, name: &'a str) -> NameId {
         if let Some(&id) = self.map.get(name) {
             return id;
         }
@@ -120,7 +120,7 @@ impl Interner {
     }
 
     // Internal helper: create an identifier for [name].
-    fn create(&mut self, name: &'static str) -> NameId {
+    fn create(&mut self, name: &'a str) -> NameId {
         let id = NameId(self.vec.len() as u32);
         self.vec.push((name, 0));
         self.map.insert(name, id);
@@ -132,7 +132,7 @@ impl Interner {
     }
 
     // Copy the string [name].
-    fn alloc(&mut self, name: &str) -> &'static str {
+    fn alloc(&mut self, name: &str) -> &'a str {
         let cap = self.buf.capacity();
         let len = name.len() + 1;
         if cap < self.buf.len() + len {
@@ -183,6 +183,9 @@ mod tests {
         let id_hello2 = int.intern(hello2);
         assert_eq!(id_hello2, id_hello);
         assert_ne!(id_hello2, id_world);
+
+        let str_world = int.lookup(id_world);
+        assert_ne!(str_hello, str_world);
 
         // test reallocation
         let ids = ('A'..='Z').map(|c| int.intern(&c.to_string()).0);

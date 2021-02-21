@@ -3,7 +3,7 @@ use std::slice;
 
 // Create an interner
 #[no_mangle]
-pub extern "C" fn sintern_new_interner(cap: u32) -> Box<Interner> {
+pub extern "C" fn sintern_new_interner<'a>(cap: u32) -> Box<Interner<'a>> {
     let res = Interner::with_capacity(cap as usize);
     Box::new(res)
 }
