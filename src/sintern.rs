@@ -32,12 +32,13 @@ mod ffi;
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[repr(C)]
 pub struct NameId(u32);
+type Info = u32;
 
 pub struct Interner<'a> {
     //  Map strings to identifiers.
     map: HashMap<&'a str, NameId>,
     //  Map identifiers to strings + info
-    vec: Vec<(&'a str, u32)>,
+    vec: Vec<(&'a str, Info)>,
     //  Current buffer where new strings are put.
     buf: String,
     //  Old (and full) buffers of existing strings.
@@ -65,12 +66,12 @@ impl<'a> Interner<'a> {
     }
 
     // Return the info associated to [id].
-    pub fn get_info(&self, id: NameId) -> u32 {
+    pub fn get_info(&self, id: NameId) -> Info {
         self.vec[id.0 as usize].1
     }
 
     // Set the info associated with [id]
-    pub fn set_info(&mut self, id: NameId, info: u32) {
+    pub fn set_info(&mut self, id: NameId, info: Info) {
         self.vec[id.0 as usize].1 = info;
     }
 
