@@ -29,6 +29,8 @@ jobs:
         FROM ghdl/debug:base
         ENV PYTHONPATH=/opt/ghdl/pyGHDL
         COPY . /opt/ghdl
+        RUN cargo --version
+        RUN rustc --version
         RUN cd /opt/ghdl && ./configure && make && make install
         EOF
 

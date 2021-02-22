@@ -226,6 +226,8 @@ build () {
 
   gstart "[GHDL - build] Environment"
   env
+  cargo --version
+  rustc --version
   gend
 
   #--- GPL: gpl-ize sources
