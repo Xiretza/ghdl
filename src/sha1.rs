@@ -1,3 +1,4 @@
+use std::convert::TryInto;
 use std::fmt;
 
 const H0: u32 = 0x6745_2301;
@@ -233,10 +234,7 @@ fn process_block(blk: &mut State, dat: [u32; 16]) {
 fn to_u32x16(v: &[u8]) -> [u32; 16] {
     let mut res: [u32; 16] = [0; 16];
     for i in 0..16 {
-        res[i] = ((v[i * 4] as u32) << 24)
-            | ((v[i * 4 + 1] as u32) << 16)
-            | ((v[i * 4 + 2] as u32) << 8)
-            | (v[i * 4 + 3] as u32);
+        res[i] = u32::from_be_bytes(v[i * 4..(i + 1) * 4].try_into().unwrap());
     }
     res
 }
