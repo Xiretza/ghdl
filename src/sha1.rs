@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{fmt, convert::TryInto};
 
 const H0: u32 = 0x67452301;
 const H1: u32 = 0xEFCDAB89;
@@ -184,7 +184,7 @@ fn process_block(blk: &mut Sha1State, dat: [u32;16]) {
     blk.e = blk.e.wrapping_add(v.e);
 }
 
-fn to_u32x16(v: &[u8]) -> [u32;16] {
+fn to_u32x16(v: &[u8;64]) -> [u32;16] {
     let mut res: [u32;16] = [0; 16];
     for i in 0..16 {
         res[i] = ((v[i*4] as u32) << 24) | ((v[i*4 + 1] as u32) << 16) | ((v[i*4 + 2] as u32) << 8) | (v[i*4 + 3] as u32);
@@ -200,7 +200,7 @@ pub fn sha1(dat: &[u8]) -> Sha1State {
     let mut off: usize = 0;
 
     while off + 64 <= len {
-        process_block(&mut res, to_u32x16(&dat[off..off + 64]));
+        process_block(&mut res, to_u32x16(dat[off..off + 64].try_into().unwrap()));
         off += 64;
     }
     let mut pad: [u8;64] = [0;64];
@@ -208,7 +208,7 @@ pub fn sha1(dat: &[u8]) -> Sha1State {
         pad[i - off] = dat[i];
     }
     pad[len - off] = 0x80;
-    let mut padu32 = to_u32x16(&pad[..]);
+    let mut padu32 = to_u32x16(&pad);
 
     let lenh = ((len * 8) >> 32) as u32;
     let lenl = ((len * 8) & 0xffff_ffff) as u32;
