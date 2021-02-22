@@ -94,7 +94,7 @@ impl<'a> Interner<'a> {
     // This is a slight optimization.
     // Note: [name] should be followed by a NULL character to follow the
     // convention.
-    pub fn intern_static(&mut self, name: &'a str) -> NameId {
+    pub unsafe fn intern_static(&mut self, name: &'a str) -> NameId {
         if let Some(&id) = self.map.get(name) {
             return id;
         }
@@ -103,7 +103,7 @@ impl<'a> Interner<'a> {
 
     // Intern [name] when it is known not to be present.
     // Barely useful except for initialization.
-    pub fn intern_extra(&mut self, name: &str) -> NameId {
+    pub unsafe fn intern_extra(&mut self, name: &str) -> NameId {
         debug_assert!(self.get_id(name).is_none());
         let name = self.alloc(name);
         let id = NameId(self.vec.len() as u32);

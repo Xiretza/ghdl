@@ -42,26 +42,28 @@ pub extern "C" fn sintern_get_identifier_no_create_with_len(
 
 // Return the unique id without copying the string [name].
 #[no_mangle]
-pub extern "C" fn sintern_get_identifier_static_with_len(
+pub unsafe extern "C" fn sintern_get_identifier_static_with_len(
     inst: &mut Interner,
     name: *const u8,
     len: u32,
 ) -> NameId {
-    inst.intern_static(unsafe {
-        std::str::from_utf8_unchecked(slice::from_raw_parts(name, len as usize))
-    })
+    inst.intern_static(std::str::from_utf8_unchecked(slice::from_raw_parts(
+        name,
+        len as usize,
+    )))
 }
 
 // Return the unique id when it is known not to already exist.
 #[no_mangle]
-pub extern "C" fn sintern_get_identifier_extra_with_len(
+pub unsafe extern "C" fn sintern_get_identifier_extra_with_len(
     inst: &mut Interner,
     name: *const u8,
     len: u32,
 ) -> NameId {
-    inst.intern_extra(unsafe {
-        std::str::from_utf8_unchecked(slice::from_raw_parts(name, len as usize))
-    })
+    inst.intern_extra(std::str::from_utf8_unchecked(slice::from_raw_parts(
+        name,
+        len as usize,
+    )))
 }
 
 // Get the C string for the [id].  It is NULL terminated.
