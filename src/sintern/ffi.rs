@@ -40,7 +40,11 @@ pub extern "C" fn sintern_get_identifier_no_create_with_len(
     id.unwrap_or(NameId(0))
 }
 
-// Return the unique id without copying the string [name].
+/// Return the unique id without copying the string [name].
+///
+/// # Safety
+///
+/// See [Interner::intern_static].
 #[no_mangle]
 pub unsafe extern "C" fn sintern_get_identifier_static_with_len(
     inst: &mut Interner,
@@ -53,7 +57,11 @@ pub unsafe extern "C" fn sintern_get_identifier_static_with_len(
     )))
 }
 
-// Return the unique id when it is known not to already exist.
+/// Intern `name` without adding it to the `string->id` lookup table.
+///
+/// # Safety
+///
+/// See [Interner::intern_extra].
 #[no_mangle]
 pub unsafe extern "C" fn sintern_get_identifier_extra_with_len(
     inst: &mut Interner,

@@ -1,54 +1,52 @@
 //! String interning.
 //! Derived from:
-//! https://matklad.github.io/2020/03/22/fast-simple-rust-interner.html
-//!
-//! It provides almost the same API as the old name_table package, but
-//! with many differences in the implementation:
-//! * the overhead is higher.  Because this implementation uses the standard
-//!   HashMap, it needs a corresponding Vec.
-//! * the strings are never moved.  In a sense, this is safer.  The reference
-//!   to a string returned by lookup is always valid (... until the whole
-//!   interner is destroyed/droped).  There is no lie.  In the previous
-//!   implementation, they could be moved when a new string was added.
-//!
-//! The string should be encoded using UTF-8 (although this is not checked).
-//!
-//! Compared to other interners, it provides these extra features:
-//! * The identifier is a u32
-//! * The identifiers are allocated sequentially. So the behaviour is
-//!   deterministic which is used to reserve identifiers for keywords.
-//! * As a consequence, it is easy to iterate over all entries.
-//!
-//! TODO (in the future) :
-//! * Reduce memory requirement (this will certainly need to write our own hash map)
-//! * Make it multi-thread ready (an RW lock should be enough).
+//! <https://matklad.github.io/2020/03/22/fast-simple-rust-interner.html>
 use std::{collections::HashMap, mem};
 
 mod ffi;
 
 /// Identifiers.
-/// They represent a interned string (use [lookup] to get it).
+/// They represent a interned string and can be obtained using the [`Interner::lookup`]
+/// family of methods.
 /// Strings are equal iff the identifiers are equal.
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[repr(C)]
 pub struct NameId(u32);
 type Info = u32;
 
+/// The interner provides almost the same API as the old `name_table` package, but
+/// with many differences in the implementation:
+/// * the overhead is higher.  Because this implementation uses the standard
+///   [`HashMap`], it needs a corresponding [`Vec`].
+/// * the strings are never moved.  In a sense, this is safer.  The reference
+///   to a string returned by lookup is valid as long as the interner is live.
+///   There is no lie.  In the previous implementation, they could be moved when
+///   a new string was added.
+///
+/// Compared to other interners, it provides these extra features:
+/// * The identifier is a [`u32`]
+/// * The identifiers are allocated sequentially. So the behaviour is
+///   deterministic which is used to reserve identifiers for keywords.
+/// * As a consequence, it is easy to iterate over all entries.
+///
+/// TODO (in the future) :
+/// * Reduce memory requirement (this will certainly need to write our own hash map)
+/// * Make it multi-thread ready (an [`RwLock`][std::sync::RwLock] should be enough).
 pub struct Interner<'a> {
-    //  Map strings to identifiers.
+    ///  Map strings to identifiers.
     map: HashMap<&'a str, NameId>,
-    //  Map identifiers to strings + info
+    ///  Map identifiers to strings + info
     vec: Vec<(&'a str, Info)>,
-    //  Current buffer where new strings are put.
+    ///  Current buffer where new strings are put.
     buf: String,
-    //  Old (and full) buffers of existing strings.
+    ///  Old (and full) buffers of existing strings.
     full: Vec<String>,
 }
 
 impl<'a> Interner<'a> {
-    // Constructor, using [cap] bytes for the initial string buffer.
-    // If you have too many characters, the buffer will be extended, so
-    // this is an initial guess.
+    /// Constructor, using `cap` bytes for the initial string buffer.
+    /// If you have too many characters, the buffer will be extended, so
+    /// this is an initial guess.
     pub fn with_capacity(cap: usize) -> Interner<'a> {
         let cap = cap.next_power_of_two();
         Interner {
@@ -59,28 +57,42 @@ impl<'a> Interner<'a> {
         }
     }
 
-    // Return the string corresponding to [id]. Will panic if [id]
-    // is not valid (eg was not returned by a method defined here).
+    /// Return the string corresponding to `id`.
+    ///
+    /// The returned string slice is guaranteed to be followed by a NULL byte, allowing
+    /// its pointer to be passed to C code as-is.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `id` is not valid (i.e. was not returned by a method of this instance).
     pub fn lookup(&self, id: NameId) -> &'a str {
         self.vec[id.0 as usize].0
     }
 
-    // Return the info associated to [id].
+    /// Return the info associated with `id`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `id` is not valid (i.e. was not returned by a method of this instance).
     pub fn get_info(&self, id: NameId) -> Info {
         self.vec[id.0 as usize].1
     }
 
-    // Set the info associated with [id]
+    /// Set the info associated with `id`
+    ///
+    /// # Panics
+    ///
+    /// Panics if `id` is not valid (i.e. was not returned by a method of this instance).
     pub fn set_info(&mut self, id: NameId, info: Info) {
         self.vec[id.0 as usize].1 = info;
     }
 
-    // Return the identifier for the string [name] if it has already been interned.
+    /// Return the identifier for the string `name` if it has already been interned.
     pub fn get_id(&self, name: &str) -> Option<NameId> {
         self.map.get(name).copied()
     }
 
-    // Intern string [name] and return the corresponding identifier.
+    /// Intern string `name` and return the corresponding identifier.
     pub fn intern(&mut self, name: &str) -> NameId {
         if let Some(&id) = self.map.get(name) {
             return id;
@@ -89,11 +101,15 @@ impl<'a> Interner<'a> {
         self.create(name)
     }
 
-    // Intern static string [name] and return the corresponding identifier.
-    // Because the lifetime of [name] is static, the string is not copied.
-    // This is a slight optimization.
-    // Note: [name] should be followed by a NULL character to follow the
-    // convention.
+    /// Intern static string `name` and return the corresponding identifier.
+    /// Because the lifetime of `name` is static, the string is not copied.
+    /// This is a slight optimization.
+    ///
+    /// # Safety
+    ///
+    /// `name` must be followed by a NULL character to uphold the guarantees of [`lookup`].
+    ///
+    /// [`lookup`]: Interner::lookup
     pub unsafe fn intern_static(&mut self, name: &'a str) -> NameId {
         if let Some(&id) = self.map.get(name) {
             return id;
@@ -101,8 +117,16 @@ impl<'a> Interner<'a> {
         self.create(name)
     }
 
-    // Intern [name] when it is known not to be present.
-    // Barely useful except for initialization.
+    /// Intern `name` without adding it to the `string->id` lookup table.
+    /// Barely useful except for initialization.
+    ///
+    /// # Safety
+    ///
+    /// This method breaks the invariant of [`NameId`], since the ID returned by this method
+    /// will be different from an ID returned by a subsequent [`intern`] call with the same
+    /// string. Use at your own risk.
+    ///
+    /// [`intern`]: Interner::intern
     pub unsafe fn intern_extra(&mut self, name: &str) -> NameId {
         debug_assert!(self.get_id(name).is_none());
         let name = self.alloc(name);
@@ -111,7 +135,7 @@ impl<'a> Interner<'a> {
         id
     }
 
-    // Return the last known identifier, if any.
+    /// Return the last known identifier, if any.
     pub fn get_last(&self) -> Option<NameId> {
         if self.vec.is_empty() {
             None
