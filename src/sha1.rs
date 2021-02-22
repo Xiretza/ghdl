@@ -261,20 +261,17 @@ pub fn sha1(dat: &[u8]) -> State {
     pad[len - off] = 0x80;
     let mut padu32 = to_u32x16(&pad[..]);
 
-    let lenh = ((len * 8) >> 32) as u32;
-    let lenl = ((len * 8) & 0xffff_ffff) as u32;
-
-    if len - off < 56 {
-        padu32[14] = lenh;
-        padu32[15] = lenl;
-        process_block(&mut res, padu32);
-    } else {
+    if len - off >= 56 {
         process_block(&mut res, padu32);
         padu32 = [0; 16];
-        padu32[14] = lenh;
-        padu32[15] = lenl;
-        process_block(&mut res, padu32);
     }
+
+    let len_bits = (len as u64) * 8;
+
+    padu32[14] = (len_bits >> 32) as u32;
+    padu32[15] = (len_bits & 0xffff_ffff) as u32;
+    process_block(&mut res, padu32);
+
     res
 }
 
