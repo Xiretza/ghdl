@@ -1,8 +1,13 @@
 [package]
 name = "ghdlinfra"
+description = "GHDL components rewritten in Rust"
 version = "0.1.0"
 authors = ["Tristan Gingold <tgingold@free.fr>"]
 edition = "2018"
+repository = "https://github.com/ghdl/ghdl"
+keywords = ["ghdl"]
+categories = ["compilers"]
+license-file = "COPYING.md"
 
 [dependencies]
 
