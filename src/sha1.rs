@@ -1,15 +1,15 @@
 use std::fmt;
 
-const H0: u32 = 0x67452301;
-const H1: u32 = 0xEFCDAB89;
-const H2: u32 = 0x98BADCFE;
-const H3: u32 = 0x10325476;
-const H4: u32 = 0xC3D2E1F0;
+const H0: u32 = 0x6745_2301;
+const H1: u32 = 0xEFCD_AB89;
+const H2: u32 = 0x98BA_DCFE;
+const H3: u32 = 0x1032_5476;
+const H4: u32 = 0xC3D2_E1F0;
 
-const K0: u32 = 0x5A827999;
-const K1: u32 = 0x6ED9EBA1;
-const K2: u32 = 0x8F1BBCDC;
-const K3: u32 = 0xCA62C1D6;
+const K0: u32 = 0x5A82_7999;
+const K1: u32 = 0x6ED9_EBA1;
+const K2: u32 = 0x8F1B_BCDC;
+const K3: u32 = 0xCA62_C1D6;
 
 #[derive(Clone, Copy, Eq, PartialEq)]
 pub struct Sha1State {
