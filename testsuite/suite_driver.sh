@@ -5,9 +5,8 @@
 
 set -e
 
-ANSI_GREEN="\033[32m"
-ANSI_RED="\033[31m"
-ANSI_NOCOLOR="\033[0m"
+SCRIPTDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/../scripts" >/dev/null 2>&1 && pwd)
+source "$SCRIPTDIR/ansi_color.sh"
 
 _suite="$1"
 shift

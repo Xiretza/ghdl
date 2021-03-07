@@ -1,22 +1,11 @@
-#! /bin/bash
+#!/bin/bash
 
 # Stop in case of error
 set -e
 
-enable_color() {
-  ENABLECOLOR=''
-  ANSI_RED="\033[31m"
-  ANSI_GREEN="\033[32m"
-  ANSI_YELLOW="\033[33m"
-  ANSI_BLUE="\033[34m"
-  ANSI_MAGENTA="\033[35m"
-  ANSI_GRAY="\033[90m"
-  ANSI_CYAN="\033[36;1m"
-  ANSI_DARKCYAN="\033[36m"
-  ANSI_NOCOLOR="\033[0m"
-}
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
-disable_color() { unset ENABLECOLOR ANSI_RED ANSI_GREEN ANSI_YELLOW ANSI_BLUE ANSI_MAGENTA ANSI_CYAN ANSI_DARKCYAN ANSI_NOCOLOR; }
+source ../scripts/ansi_color.sh
 enable_color
 
 print_start() {
@@ -83,7 +72,6 @@ if [ "x$GHDL" = "x" ]; then
   fi
 fi
 
-cd $(dirname "$0")
 rm -f test_ok
 failures=""
 tests=

@@ -22,13 +22,12 @@ LN=ln
 # Exit in case of failure in shell scripts.
 set -e
 
-# Define colors
-ANSI_NOCOLOR="\033[0m"
-ANSI_RED="\033[31m"
-ANSI_BLUE="\033[34m"
-ANSI_GREEN="\033[32m"
-# Optionally disable colors
-if [ -z "$ENABLECOLOR" ]; then unset ANSI_NOCOLOR ANSI_RED ANSI_BLUE ANSI_GREEN; fi
+GHDL_ROOTDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 && pwd)
+
+source "$GHDL_ROOTDIR/scripts/ansi_color.sh"
+
+# Optionally enable colors
+[ -n "${ENABLECOLOR:-}" ] && enable_color
 
 if [ x"$GHDL" = x ]; then
   echo "error: GHDL environment variable is not defined"
